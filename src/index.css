@@ -1074,6 +1074,237 @@ img {
   font-size: 0.8rem;
 }
 
+/* ===== Photo booth ===== */
+.results__hero {
+  display: grid;
+  gap: 0.75rem;
+}
+.btn--photo {
+  width: 100%;
+}
+
+.booth {
+  width: min(720px, calc(100vw - 1rem));
+  max-height: calc(100dvh - 1rem);
+  overflow-y: auto;
+  padding: 1rem;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+}
+.booth[open] {
+  animation: rise 0.3s ease-out;
+}
+.booth::backdrop {
+  background: rgba(17, 24, 39, 0.7);
+  backdrop-filter: blur(3px);
+}
+.booth__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+.booth__header h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.2rem;
+  color: var(--navy);
+}
+.booth__header h2 svg {
+  color: var(--theme);
+}
+.booth__close {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: #f3f4f6;
+  color: var(--navy);
+  cursor: pointer;
+}
+.booth__close:hover {
+  background: #e5e7eb;
+}
+
+.booth__stage[hidden] {
+  display: none;
+}
+.booth__frame {
+  position: relative;
+  margin: 0 auto;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: #111827;
+  touch-action: none;
+  user-select: none;
+}
+.booth__video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.booth__video.is-mirrored {
+  transform: scaleX(-1);
+}
+.booth__video[hidden] {
+  display: none;
+}
+.booth__pokemon {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  height: auto;
+  cursor: grab;
+  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.35));
+  touch-action: none;
+}
+.booth__pokemon:active {
+  cursor: grabbing;
+}
+.booth__pokemon:focus-visible {
+  box-shadow: none;
+  outline: 3px dashed #fff;
+  outline-offset: 4px;
+}
+.booth__overlay-msg {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.5rem;
+  color: #fff;
+  font-weight: 700;
+}
+.booth__countdown {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: clamp(4rem, 18vw, 8rem);
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  animation: pop 0.6s ease-out;
+  pointer-events: none;
+}
+.booth__flash {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  animation: flash 0.4s ease-out forwards;
+  pointer-events: none;
+}
+
+.booth__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin: 0.75rem 0;
+}
+.booth__size {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 700;
+  color: var(--navy);
+  flex: 1;
+  min-width: 200px;
+}
+.booth__size input {
+  flex: 1;
+  accent-color: var(--red);
+  min-height: 32px;
+}
+.booth__hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ink-3);
+}
+
+.booth__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+}
+.booth__actions a.btn {
+  text-decoration: none;
+}
+
+.booth__message {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  text-align: center;
+  padding: 1.5rem 0.5rem;
+  color: var(--red-dark);
+  font-weight: 600;
+}
+.booth__error {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--red-dark);
+  font-weight: 700;
+}
+
+.booth__review {
+  display: grid;
+  gap: 0.9rem;
+}
+.booth__result {
+  display: block;
+  max-width: 100%;
+  max-height: 60vh;
+  margin: 0 auto;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  animation: reveal 0.4s ease-out;
+}
+
+.booth__status {
+  min-height: 1.4rem;
+  margin: 0.6rem 0 0;
+  text-align: center;
+  font-weight: 700;
+  color: var(--navy);
+}
+.booth__privacy {
+  margin: 0.25rem 0 0;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--ink-3);
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes flash {
+  from {
+    opacity: 0.9;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* ===== Larger screens ===== */
 @media (min-width: 640px) {
   .main {
@@ -1106,7 +1337,7 @@ img {
     grid-template-columns: 5fr 6fr;
     align-items: start;
   }
-  .pokemon-card--hero {
+  .results__hero {
     position: sticky;
     top: 1rem;
   }

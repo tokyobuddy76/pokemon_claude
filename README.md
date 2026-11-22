@@ -4,6 +4,14 @@ An unofficial, fan-made personality quiz. Answer 10 questions and PokéMatch mat
 
 Built with **Vite + React**, **Recharts** (radar chart), **Lucide React** (icons), and plain CSS.
 
+### 📸 Photo with your Pokémon
+After the quiz, tap **Take a Photo with {Pokémon}** on the results screen:
+- Live camera preview, with the Pokémon's official artwork on top. Drag it (or use the arrow keys) to place it, use the slider (or **+**/**−**) to resize it, and use **Flip** to switch between front and back cameras.
+- A 3-2-1 countdown, then the photo is saved with a "Me & {Pokémon} · NN% match" banner. **Download** it as a JPEG, or **Share** it where the browser supports sharing files.
+- **Upload Photo** works without a camera, or when camera permission is denied.
+- The photo is created entirely in your browser (HTML canvas) and is **never uploaded**. The camera turns off as soon as you capture or close the booth.
+- The camera needs HTTPS (Vercel) or `localhost`. `vercel.json` allows it with `Permissions-Policy: camera=(self)`.
+
 ---
 
 ## Quick start
@@ -50,6 +58,8 @@ npm test
 - **Ranking:** results are sorted; top 3 are distinct; a planted clone ranks first; variety across 5,000 sampled answer sets (40+ distinct winners, none above 10%).
 - **Explanations and sharing:** explanations reference the user's real answers; share text never contains answers.
 
+`tests/photoComposer.test.js` covers the photo booth layout maths (placement matches at any resolution, clamping, output size limit), the caption content, and the camera error messages.
+
 `tests/pokemonApi.test.js` covers the serverless function: ID validation (no upstream call for bad IDs), response mapping, missing artwork returned as `null`, incomplete data (502), upstream errors (502), network failures (502), timeouts (504), and non-GET requests (405).
 
 ### Manual checklist (desktop and mobile)
@@ -60,8 +70,9 @@ npm test
 5. Results show artwork, types, height, weight, abilities, match %, strengths, explanation, radar chart and table, and the top 3.
 6. **Copy Results** / **Share My Match** share only the Pokémon name, percentage and link.
 7. **Retake Quiz** clears everything.
-8. Keyboard only: Tab to the answers, arrow keys to choose, Enter for Next.
-9. Upstream failure: run `POKEAPI_BASE_URL=http://127.0.0.1:9 npm run dev`. Cards show a friendly error and **Retry**, with no placeholder data.
+8. **Take a Photo**: allow the camera, drag and resize the Pokémon, take the photo, then Download. Deny camera permission to check the Upload Photo fallback.
+9. Keyboard only: Tab to the answers, arrow keys to choose, Enter for Next.
+10. Upstream failure: run `POKEAPI_BASE_URL=http://127.0.0.1:9 npm run dev`. Cards show a friendly error and **Retry**, with no placeholder data.
 
 ---
 
@@ -103,6 +114,7 @@ Because the comparison uses mean-centred vectors, Pokémon that are high in ever
 - The API accepts only the 62 Pokédex IDs used by the quiz. It validates input before any outbound request, applies a timeout, trims the response, and sends cache headers to respect PokéAPI's fair-use policy.
 - No data is invented. Missing artwork shows "Artwork unavailable", and failed requests show an error with Retry.
 - No accounts and no personal data. Quiz progress (question and answer IDs only) is kept in `sessionStorage` in your browser and cleared when the tab closes. Answers are never sent to a server or an AI model.
+- Photo booth pictures are composed locally on a canvas and never uploaded. Camera streams are stopped when you capture or close.
 - Explanations come from predefined templates in `src/utils/explanations.js`.
 
 ## Accessibility
@@ -131,6 +143,7 @@ pokematch/
 │   │   ├── ResultsScreen.jsx      Results, top 3, share, retake
 │   │   ├── PokemonCard.jsx        Live Pokémon data with loading/error/retry
 │   │   ├── PersonalityChart.jsx   Recharts radar chart + comparison table
+│   │   ├── PhotoBooth.jsx         Camera/upload photo with the matched Pokémon
 │   │   └── Footer.jsx             Credits and disclaimers
 │   ├── data/
 │   │   ├── questions.js           10 questions, answer weights, dimensions
@@ -140,10 +153,12 @@ pokematch/
 │   │   ├── explanations.js        Explanation/strength/share templates
 │   │   ├── pokemonApi.js          Frontend client + usePokemon hook
 │   │   ├── storage.js             sessionStorage progress (validated)
+│   │   ├── photoComposer.js       Photo layout + canvas composition
 │   │   └── theme.js               Type colours, reduced-motion hook
 │   ├── App.jsx, main.jsx, index.css
 ├── tests/
 │   ├── matchingAlgorithm.test.js
+│   ├── photoComposer.test.js
 │   └── pokemonApi.test.js
 ├── index.html, vite.config.js, vercel.json, package.json
 ├── .env.example, .gitignore

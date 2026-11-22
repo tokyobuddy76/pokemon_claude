@@ -1,11 +1,14 @@
-import { useMemo, useState } from 'react';
-import { AlertCircle, Check, Copy, Lightbulb, RotateCcw, Share2, Star, Trophy } from 'lucide-react';
+import { lazy, Suspense, useCallback, useMemo, useState } from 'react';
+import { AlertCircle, Camera, Check, Copy, Lightbulb, RotateCcw, Share2, Star, Trophy } from 'lucide-react';
 import PokemonCard from './PokemonCard.jsx';
 import PersonalityChart from './PersonalityChart.jsx';
 import { findBestMatches } from '../utils/matchingAlgorithm.js';
 import { buildExplanation, buildMatchReason, buildShareText, getStrengths } from '../utils/explanations.js';
 import { usePokemon } from '../utils/pokemonApi.js';
 import { DEFAULT_THEME, themeForTypes } from '../utils/theme.js';
+
+// The photo booth is only loaded when the user opens it.
+const PhotoBooth = lazy(() => import('./PhotoBooth.jsx'));
 
 async function copyText(text) {
   if (navigator.clipboard?.writeText && window.isSecureContext) {
@@ -106,6 +109,8 @@ export default function ResultsScreen({ answers, onRetake }) {
 
   const topId = result?.matches[0]?.pokemon.id ?? 0;
   const heroState = usePokemon(topId);
+  const [boothOpen, setBoothOpen] = useState(false);
+  const closeBooth = useCallback(() => setBoothOpen(false), []);
 
   if (!result) {
     return (
@@ -145,7 +150,14 @@ export default function ResultsScreen({ answers, onRetake }) {
       </header>
 
       <div className="results__grid">
-        <PokemonCard state={heroState} fallbackName={pokemon.name} percent={best.percent} />
+        <div className="results__hero">
+          <PokemonCard state={heroState} fallbackName={pokemon.name} percent={best.percent} />
+          {heroState.status === 'success' && heroState.data.artwork && (
+            <button type="button" className="btn btn--primary btn--photo" onClick={() => setBoothOpen(true)}>
+              <Camera size={20} aria-hidden="true" /> Take a Photo with {displayName}
+            </button>
+          )}
+        </div>
 
         <div className="results__details">
           <section className="panel" aria-labelledby="about-title">
@@ -200,6 +212,18 @@ export default function ResultsScreen({ answers, onRetake }) {
           <RotateCcw size={18} aria-hidden="true" /> Retake Quiz
         </button>
       </div>
+
+      {boothOpen && heroState.status === 'success' && heroState.data.artwork && (
+        <Suspense fallback={null}>
+          <PhotoBooth
+            pokemonName={displayName}
+            artwork={heroState.data.artwork}
+            percent={best.percent}
+            theme={theme}
+            onClose={closeBooth}
+          />
+        </Suspense>
+      )}
 
       <p className="results__disclaimer">
         Match percentages show how similar your answers are to our fan-made personality profiles. Just for fun, not a
